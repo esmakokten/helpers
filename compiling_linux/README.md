@@ -43,10 +43,9 @@ Example: `/bin/busybox sh` will start a shell, `/bin/busybox ls` will list files
     - `/proc`
     - `/sys`
     - `/dev`
-5. To get rid of `busybox command` prefix, create symlinks for each Busybox applet in `/bin`.
-6. Create an `init` script that will be executed by the kernel during boot. The `init` script should:
-    - Mount necessary filesystems (`proc`, `sysfs`, `devtmpfs`).
-    - Start a shell or any other process.
+5. Copy the Busybox binary and symlinks from `_install` directory to the root filesystem.
+6. Create an `init` script that will execute `/sbin/init` (Busybox init).
+7. Create a `inittab` file to define the init process behavior.
 8. Create the initramfs image using `cpio` and compress it with `gzip`.
 9. Copy the initramfs image to the output directory.
 

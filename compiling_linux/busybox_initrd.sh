@@ -43,28 +43,28 @@ make oldconfig < /dev/null
 
 # --- Build & install BusyBox --------------------------------------------------
 make -j"$(nproc)"
+make install
 
 # --- Minimal rootfs layout ----------------------------------------------------
 mkdir -p "$WORK"/initrd
 cd "$WORK"/initrd
-mkdir -p {proc,sys,dev,bin}
-cd bin
-cp "$BB_BUILD/busybox" .
-# Create symlinks for  BusyBox applets
-for applet in $(./busybox --list); do
-  ln -s busybox "$applet"
-done
+mkdir -p etc proc sys dev
+cp -a "$BB_BUILD"/_install/* .
 
-# --- /init (PID 1) ------------------------------------------------------------
-cat > "$WORK/initrd/init" <<'EOF'
-#!/bin/sh
-mount -t sysfs sysfs /sys
-mount -t proc proc /proc
-mount -t devtmpfs udev /dev
-sysctl -w kernel.printk="2 4 1 7"
-/bin/sh
+# --- Simple /etc/inittab (BusyBox init handles everything) -------------------
+cat > etc/inittab <<'EOF'
+::sysinit:/bin/mount -t proc proc /proc
+::sysinit:/bin/mount -t sysfs sysfs /sys  
+::sysinit:/bin/mount -t devtmpfs devtmpfs /dev
+::respawn:-/bin/sh
 EOF
-chmod +x "$WORK/initrd/init"
+
+# Create minimal /init script that calls BusyBox init
+cat > init <<'EOF'
+#!/bin/sh
+exec /sbin/init
+EOF
+chmod +x init
 
 # TODO: We can compile and put our own measurement programs in initramfs.
 
