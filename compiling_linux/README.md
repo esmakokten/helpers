@@ -26,9 +26,8 @@ TODO: Here we can use `make tinyconfig` for smallest kernel. Then manually enabl
 
 This work goes into understanding linux kernel configuration better, leave it for now. and use default config `make defconfig` for now.
 ```
-3. Modify the kernel configuration to include necessary options (see below).
-4. Compile the kernel using `make -j$(nproc)`.
-5. Copy the compiled kernel image to the output directory.
+3. Compile the kernel using `make -j$(nproc)`.
+4. Copy the compiled kernel image to the output directory.
 
 ### Initramfs with Busybox
 
