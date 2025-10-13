@@ -1,0 +1,3 @@
+# Ignore build artifacts
+compiling_linux/busybox_initrd/*
+compiling_linux/tinylinux/*

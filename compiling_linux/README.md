@@ -46,8 +46,9 @@ Example: `/bin/busybox sh` will start a shell, `/bin/busybox ls` will list files
 5. Copy the Busybox binary and symlinks from `_install` directory to the root filesystem.
 6. Create an `init` script that will execute `/sbin/init` (Busybox init).
 7. Create a `inittab` file to define the init process behavior.
-8. Create the initramfs image using `cpio` and compress it with `gzip`.
-9. Copy the initramfs image to the output directory.
+9. Create the initramfs image using `cpio` and compress it with `gzip`.
+
+> You can also add custom programs or scripts to initramfs. Remember to compile any custom C programs with `gcc -static -o <program_name> <source_file.c>` to create static binaries. See `/compiling_linux/programs/rdtsc.c` for an example.
 
 ### Booting the Kernel
 To try out the build, you can boot the compiled kernel with the initramfs using QEMU:

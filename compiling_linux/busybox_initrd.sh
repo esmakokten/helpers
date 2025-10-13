@@ -43,13 +43,12 @@ make oldconfig < /dev/null
 
 # --- Build & install BusyBox --------------------------------------------------
 make -j"$(nproc)"
-make install
 
 # --- Minimal rootfs layout ----------------------------------------------------
-mkdir -p "$WORK"/initrd
+rm -rf "$WORK/initrd"
+make install CONFIG_PREFIX="$WORK/initrd"
 cd "$WORK"/initrd
 mkdir -p etc proc sys dev
-cp -a "$BB_BUILD"/_install/* .
 
 # --- Simple /etc/inittab (BusyBox init handles everything) -------------------
 cat > etc/inittab <<'EOF'
@@ -66,8 +65,6 @@ exec /sbin/init
 EOF
 chmod +x init
 
-# TODO: We can compile and put our own measurement programs in initramfs.
-
 # --- Pack initramfs -----------------------------------------------------------
 cd "$WORK/initrd"
 find . -print0 \
@@ -75,4 +72,6 @@ find . -print0 \
  | gzip -9 > "$OUT/initramfs.cpio.gz"
 
 echo "Built initramfs at: $OUT/initramfs.cpio.gz"
+echo "Rootfs size:"
+du -sh "$WORK/initrd"
 
