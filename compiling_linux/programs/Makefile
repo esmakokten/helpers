@@ -33,6 +33,5 @@ programs:
 
 # Clean everything
 clean:
-	rm -rf busybox_initrd
-
+	rm -rf $(INTRD)
 .PHONY: all busybox programs clean
