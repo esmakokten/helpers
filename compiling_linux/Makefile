@@ -13,7 +13,7 @@ QEMU_FLAGS =  -smp $(CORES) \
               -append "console=ttyS0" -nographic
 
 
-.PHONY: all run kernel initrd clean
+.PHONY: all run kernel initrd clean reset
 
 all: run
 
