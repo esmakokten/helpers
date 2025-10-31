@@ -38,7 +38,6 @@ int main(void)
     for (int i = 0; i < MEASURE_COUNT; i++)
     {
         start = measure_start();
-        measured_function(&variable);
         end = measure_end();
         measurements[i] = end - start;
     }

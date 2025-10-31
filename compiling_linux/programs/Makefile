@@ -27,15 +27,16 @@ $(PROGRAMS_DIR)/%.c:
 		if [ -f "$$f" ]; then \
 			name=$$(basename "$$f" .c); \
 			echo "Compiling $$name..."; \
-			gcc -static -o "$$name" "$$f"; \
-			cp "$$name" $(INITRD)/programs/; \
+			gcc -static -o "$$name.o" "$$f"; \
+			cp "$$name.o" $(INITRD)/programs/; \
 		fi; \
 	done
 
 programs:$(PROGRAMS_DIR)/%.c
 # Clean everything
 clean:
-	rm -rf $(INITRD)
-	rm $(OUT)
-	rm *.s
+	-rm -rf $(INITRD)
+	-rm $(OUT)
+	-rm *.s
+	-rm *.o
 .PHONY: all busybox programs clean
