@@ -20,7 +20,8 @@ busybox:
 	fi
 
 # Compile programs
-programs:
+$(PROGRAMS_DIR)/%.c:
+ 	
 	@mkdir -p $(INITRD)/programs
 	@for f in $(PROGRAMS_DIR)/*.c; do \
 		if [ -f "$$f" ]; then \
@@ -31,7 +32,10 @@ programs:
 		fi; \
 	done
 
+programs:$(PROGRAMS_DIR)/%.c
 # Clean everything
 clean:
-	rm -rf $(INTRD)
+	rm -rf $(INITRD)
+	rm $(OUT)
+	rm *.s
 .PHONY: all busybox programs clean

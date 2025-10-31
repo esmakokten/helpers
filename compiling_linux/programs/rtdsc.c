@@ -3,7 +3,7 @@
 
 static inline void measured_function(uint64_t *var)
 {
-   
+
 }
 
 static inline uint64_t measure_start(void)

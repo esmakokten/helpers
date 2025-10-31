@@ -42,7 +42,6 @@ kernel: $(KERNEL)
 
 $(INITRD):
 	./busybox_initrd.sh
-	@true
 
 initrd: $(INITRD)
 
