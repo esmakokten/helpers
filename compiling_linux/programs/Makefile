@@ -20,19 +20,23 @@ busybox:
 	fi
 
 # Compile programs
-programs:
+$(PROGRAMS_DIR)/%.c:
+ 	
 	@mkdir -p $(INITRD)/programs
 	@for f in $(PROGRAMS_DIR)/*.c; do \
 		if [ -f "$$f" ]; then \
 			name=$$(basename "$$f" .c); \
 			echo "Compiling $$name..."; \
-			gcc -static -o "$$name" "$$f"; \
-			cp "$$name" $(INITRD)/programs/; \
+			gcc -static -o "$$name.o" "$$f"; \
+			cp "$$name.o" $(INITRD)/programs/; \
 		fi; \
 	done
 
+programs:$(PROGRAMS_DIR)/%.c
 # Clean everything
 clean:
-	rm -rf busybox_initrd
-
+	-rm -rf $(INITRD)
+	-rm $(OUT)
+	-rm *.s
+	-rm *.o
 .PHONY: all busybox programs clean

@@ -1,10 +1,22 @@
 #include <stdint.h>
 #include <stdio.h>
-
-static inline void measured_function(uint64_t *var)
+#include <sys/io.h>
+static inline void measured_function_outb(uint64_t *var)
 {
-   
+	__asm__ __volatile__ (
+	"outb %b0, %w1"           // Assembly instruction: outb source, destination
+	:                       // No output operands
+	: "a"('T'), "Nd"(0xe9) // Input operands: %0 gets 'data' in 'a' register, %1 gets 0xe9 in 'd' register
+    	: "memory"
+   );
 }
+static inline void measured_function_cpuid(uint64_t *var)
+{
+	__asm__ __volatile__ (
+   		"cpuid"
+	);
+}
+#define MEASURED_FUNCTION measured_function_cpuid
 
 static inline uint64_t measure_start(void)
 {
@@ -31,16 +43,28 @@ static inline uint64_t measure_end(void)
 
 int main(void)
 {
+    iopl(3);
     uint64_t start, end;
     uint64_t variable = 0;
     uint64_t measurements[MEASURE_COUNT];
-
+    
+    //Warmup the cache
     for (int i = 0; i < MEASURE_COUNT; i++)
     {
         start = measure_start();
-        measured_function(&variable);
+        MEASURED_FUNCTION(&variable);
         end = measure_end();
         measurements[i] = end - start;
+    }
+    
+ 
+    //Test for real
+    for (int i = 0; i < MEASURE_COUNT; i++)
+    {
+        start = measure_start();
+        MEASURED_FUNCTION(&variable);
+        end = measure_end();
+	measurements[i] = end - start;
     }
 
     uint64_t total = 0;
@@ -49,7 +73,7 @@ int main(void)
         total += measurements[i];
     }
     double average = (double)total / MEASURE_COUNT;
-    printf("Average cycles for measured_function: %.2f\n", average);
+    printf("\n\nAverage cycles for measured_function: %.2f\n", average);
     printf("All measurements:\n");
     for (int i = 0; i < MEASURE_COUNT; i++)
     {
