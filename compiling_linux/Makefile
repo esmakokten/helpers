@@ -18,10 +18,10 @@ QEMU_FLAGS =  -smp $(CORES) \
 all: run
 
 # Run QEMU with built kernel + initrd
-run: programs 
-	qemu-system-x86_64 -enable-kvm -cpu host $(QEMU_FLAGS)
 run_out: programs 
 	qemu-system-x86_64 -enable-kvm -cpu host -debugcon file:data.txt $(QEMU_FLAGS)
+run: programs 
+	qemu-system-x86_64 -enable-kvm -cpu host $(QEMU_FLAGS)
 run_naive: programs 
 	qemu-system-x86_64 $(QEMU_FLAGS)
 

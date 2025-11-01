@@ -1,11 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/io.h>
-
-static inline void measured_function(uint64_t *var)
+static inline void measured_function_outb(uint64_t *var)
 {
-    // The 'volatile' keyword prevents the compiler from optimizing away the instruction
-    // if it thinks the output is unused.
 	__asm__ __volatile__ (
 	"outb %b0, %w1"           // Assembly instruction: outb source, destination
 	:                       // No output operands
@@ -13,6 +10,13 @@ static inline void measured_function(uint64_t *var)
     	: "memory"
    );
 }
+static inline void measured_function_cpuid(uint64_t *var)
+{
+	__asm__ __volatile__ (
+   		"cpuid"
+	);
+}
+#define MEASURED_FUNCTION measured_function_cpuid
 
 static inline uint64_t measure_start(void)
 {
@@ -43,17 +47,22 @@ int main(void)
     uint64_t start, end;
     uint64_t variable = 0;
     uint64_t measurements[MEASURE_COUNT];
+    
+    //Warmup the cache
     for (int i = 0; i < MEASURE_COUNT; i++)
     {
         start = measure_start();
-        measured_function(&variable);
+        MEASURED_FUNCTION(&variable);
         end = measure_end();
         measurements[i] = end - start;
     }
+    
+ 
+    //Test for real
     for (int i = 0; i < MEASURE_COUNT; i++)
     {
         start = measure_start();
-        measured_function(&variable);
+        MEASURED_FUNCTION(&variable);
         end = measure_end();
 	measurements[i] = end - start;
     }

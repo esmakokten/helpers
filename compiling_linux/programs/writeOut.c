@@ -25,7 +25,6 @@ int main(void)
 	iopl(3);
 	int character;
 	writeChar('\n');
-	writeString("Start of data out:\n");
 	while ((character = fgetc(stdin)) != EOF) {
 		writeChar(character); 
 	}
