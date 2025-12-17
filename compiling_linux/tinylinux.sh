@@ -38,4 +38,5 @@ make defconfig
 
 # --- Build Linux kernel -------------------------------------------------------
 make -j"$(nproc)" || exit 1
+# --- Copy kernel image --------------------------------------------------------
 cp arch/x86/boot/bzImage "$OUT/vmlinuz-$KERNEL_VERSION"

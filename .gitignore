@@ -1,3 +1,10 @@
 # Ignore build artifacts
 compiling_linux/busybox_initrd/*
 compiling_linux/tinylinux/*
+# Ignore temporary files
+*~
+*.swp
+# Ignore compiled object files
+*.o
+*.ko
+`
