@@ -53,7 +53,7 @@ ko:
 scripts:
 	@echo "Copying scripts..."
 	@mkdir -p $(INITRD)/scripts
-	@cp $(PROGRAMS_DIR)/scripts/* $(INITRD)/scripts/
+	@cp $(PROGRAMS_DIR)/scripts/* $(INITRD)/scripts/ || :
 
 # Clean everything
 clean:
