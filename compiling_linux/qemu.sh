@@ -21,9 +21,15 @@ echo "INITRD_IMAGE: $INITRD_IMAGE"
 QEMU_OPTS=()
 QEMU_OPTS+=("-enable-kvm")
 QEMU_OPTS+=("-cpu" "host")
-QEMU_OPTS+=("-smp" "2")
-QEMU_OPTS+=("-debugcon" "file:debugcon.log" "-global" "isa-debugcon.iobase=0xe9")
+QEMU_OPTS+=("-smp" "1")
+#QEMU_OPTS+=("-debugcon" "file:debugcon.log" "-global" "isa-debugcon.iobase=0xe9")
+QEMU_OPTS+=("-chardev" "null,id=debug")
+QEMU_OPTS+=("-device" "isa-debugcon,iobase=0xe9,chardev=debug") 
+QEMU_OPTS+=("-device" "edu") # Example of adding a custom device (edu) - for MMIO experiments
+#QEMU_OPTS+=("-vcpu" "vcpunum=0,affinity=1") # Pin vCPU 0 to host CPU 1 (In host isolate CPU 1 for example)
 
+# Kernel command line options
+QEMU_OPTS+=("-append" "console=ttyS0")
 
 
 # Launch QEMU
@@ -33,7 +39,6 @@ ${TASKSET_CMD[@]}
 qemu-system-x86_64
     -kernel $KERNEL_IMAGE
     -initrd $INITRD_IMAGE
-    -append "console=ttyS0"
     -nographic
     ${QEMU_OPTS[@]}
     $@
@@ -43,7 +48,6 @@ EOF
 qemu-system-x86_64 \
     -kernel "$KERNEL_IMAGE" \
     -initrd "$INITRD_IMAGE" \
-    -append "console=ttyS0 acpi.debug_level=ACPI_DEBUG smp.debug_level=SMP_DEBUG ignore_loglevel" \
     -nographic \
     "${QEMU_OPTS[@]}" \
     "$@"

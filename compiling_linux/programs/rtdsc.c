@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include "stats.h"
 
 static inline void measured_function(uint64_t *var)
 {
@@ -35,30 +36,18 @@ int main(void)
     uint64_t variable = 0;
     uint64_t measurements[MEASURE_COUNT];
 
+    stats_t stats;
+    stats_init(&stats, measurements, MEASURE_COUNT);
+
     for (int i = 0; i < MEASURE_COUNT; i++)
     {
         start = measure_start();
         measured_function(&variable);
         end = measure_end();
-        measurements[i] = end - start;
+        stats_add_sample(&stats, end - start);
     }
 
-    uint64_t total = 0;
-    for (int i = 0; i < MEASURE_COUNT; i++)
-    {
-        total += measurements[i];
-    }
-    double average = (double)total / MEASURE_COUNT;
-    printf("Average cycles for measured_function: %.2f\n", average);
-    printf("All measurements:\n");
-    for (int i = 0; i < MEASURE_COUNT; i++)
-    {
-        printf("%lu", measurements[i]);
-        if (i < MEASURE_COUNT - 1)
-            printf(", ");
-        if ((i + 1) % 10 == 0)
-            printf("\n");  
-    }
+    stats_print_detailed(&stats, "measured_function");
 
     return 0;
 }

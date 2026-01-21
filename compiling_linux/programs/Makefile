@@ -22,6 +22,8 @@ busybox:
 
 # Compile programs
 programs:
+	@echo "Compiling custom programs..."
+	@rm -rf $(INITRD)/programs
 	@mkdir -p $(INITRD)/programs
 	@for f in $(PROGRAMS_DIR)/*.c; do \
 		if [ -f "$$f" ]; then \
@@ -35,6 +37,7 @@ programs:
 # Compile modules 
 ko:
 # Create Kbuild file to include only .c files and skip .mod.c files 
+	@rm -rf $(INITRD)/modules
 	@mkdir -p $(INITRD)/modules
 	@echo "# Auto-generated Kbuild" > $(PROGRAMS_DIR)/modules/Kbuild 
 	@for f in $(PROGRAMS_DIR)/modules/*.c; do \
@@ -52,7 +55,9 @@ ko:
 
 scripts:
 	@echo "Copying scripts..."
+	@rm -rf $(INITRD)/scripts
 	@mkdir -p $(INITRD)/scripts
+	@chmod +x $(PROGRAMS_DIR)/scripts/*.sh || :
 	@cp $(PROGRAMS_DIR)/scripts/* $(INITRD)/scripts/ || :
 
 # Clean everything
