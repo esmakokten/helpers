@@ -25,6 +25,7 @@ static inline uint64_t rdtsc_serialized_end(void) {
 #define IOCTL_RUN_VMCALL   _IOW('v', 1, unsigned long)  // does vmcall
 #define IOCTL_RUN_CPUID     _IOW('v', 2, unsigned long)  // does cpuid (fast path)
 #define IOCTL_RUN_OUTB     _IOW('v', 3, unsigned long)  // does out 0xE9 from kernel
+#define IOCTL_RUN_EMPTY    _IOW('v', 4, unsigned long)  // does nothing
 
 #define DEVICE_PATH "/dev/kvm-fake"
 
@@ -37,11 +38,13 @@ int main(int argc, char *argv[]) {
     uint64_t *s1 = aligned_alloc(64, N*sizeof(uint64_t));
     uint64_t *s2 = aligned_alloc(64, N*sizeof(uint64_t));
     uint64_t *s3 = aligned_alloc(64, N*sizeof(uint64_t));
+    uint64_t *s4 = aligned_alloc(64, N*sizeof(uint64_t));
 
-    stats_t stats1, stats2, stats3;
+    stats_t stats1, stats2, stats3, stats4;
     stats_init(&stats1, s1, N);
     stats_init(&stats2, s2, N);
     stats_init(&stats3, s3, N);
+    stats_init(&stats4, s4, N);
 
     printf("=== User to Kernel Microbenchmark ===\n");
     printf("Number of iterations: %d\n\n", N);
@@ -103,9 +106,25 @@ int main(int argc, char *argv[]) {
     }
     printf("  ✓ Completed\n\n");
 
+    // Test 4: Empty instruction
+    printf("Running Test 4: Empty instruction...\n");
+    for (int i=0;i<N;i++) {
+        uint64_t t0 = rdtsc_serialized_start();
+        ret = ioctl(fd, IOCTL_RUN_EMPTY, N);
+        uint64_t t1 = rdtsc_serialized_end();
+        if (ret < 0) {
+            fprintf(stderr, "Error: IOCTL_RUN_EMPTY failed: %s\n", strerror(errno));
+            close(fd);
+            return 1;
+        }
+        stats_add_sample(&stats4, t1 - t0);
+    }
+    printf("  ✓ Completed\n\n");
+
     stats_print_detailed(&stats1, "CPUID(user-kernel, fast)");
     stats_print_detailed(&stats2, "VMCALL(user-kernel, medium)");
     stats_print_detailed(&stats3, "OUT 0xE9(user-kernel, slow)");
+    stats_print_detailed(&stats4, "EMPTY(user-kernel, none)");
 
     close(fd);
     return 0;

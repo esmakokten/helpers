@@ -33,6 +33,9 @@ int main(int argc, char **argv) {
     const int N = (argc>1)?atoi(argv[1]):500000;
     //pin_cpu0(); lock_mem();
 
+    printf("=== User Space Microbenchmark ===\n");
+    printf("Number of iterations: %d\n\n", N);
+
     uint64_t *s1 = aligned_alloc(64, N*sizeof(uint64_t));
     uint64_t *s2 = aligned_alloc(64, N*sizeof(uint64_t));
 
@@ -50,7 +53,13 @@ int main(int argc, char **argv) {
     }
 
     // SLOW PATH: outb to port 0xE9 (handled in QEMU userspace)
-    if (ioperm(0xE9, 1, 1)) { perror("ioperm"); return 1; }
+    if (ioperm(0xE9, 1, 1)) {
+        perror("ioperm");
+        fprintf(stderr, "Warning: Cannot get I/O port access. Skipping slow path test.\n");
+        fprintf(stderr, "This requires CONFIG_X86_IOPL_IOPERM=y in kernel config.\n");
+        stats_print_detailed(&stats1, "CPUID(user, fast)");
+        return 0;
+    }
     for (int i=0;i<N;i++) {
         uint64_t t0 = rdtsc_serialized_start();
         __asm__ __volatile__ (
