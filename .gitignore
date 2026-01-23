@@ -6,5 +6,14 @@ compiling_linux/tinylinux/*
 *.swp
 # Ignore compiled object files
 *.o
+# Ignore kernel module files
 *.ko
-`
+*.mod.c
+*.mod
+*.cmd
+*.symvers
+*.order
+Kbuild
+
+# Ignore log files
+*.log

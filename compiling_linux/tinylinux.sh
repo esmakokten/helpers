@@ -16,6 +16,10 @@ echo "OUT: $OUT"
 
 mkdir -p "$WORK" "$OUT"
 
+# -- Needed tools -------------------------------------------------------------
+sudo apt-get update
+sudo apt-get install -y build-essential curl libncurses-dev libelf-dev libssl-dev bison flex
+
 # --- Fetch Linux kernel -------------------------------------------------------
 cd "$WORK"
 if [ ! -f "linux-$KERNEL_VERSION.tar.xz" ]; then
