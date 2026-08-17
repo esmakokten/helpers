@@ -127,7 +127,7 @@ static int __init microbench_init(void){
     ret = cdev_add(&cdev, devno, 1);
     if (ret) goto err_unregister;
 
-    cls = class_create("kvm-microbench");
+    cls = class_create(THIS_MODULE, "kvm-microbench");
     if (IS_ERR(cls)) { ret = PTR_ERR(cls); goto err_cdev; }
 
     if (!device_create(cls, NULL, devno, NULL, "kvm-microbench")) {

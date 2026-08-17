@@ -5,11 +5,15 @@ echo "Replace this with your actual initrd initialization code."
 # Create essential directories first
 mkdir -p /dev /proc /sys /bin /modules /programs 
 
+# Create console device node early (before mounting)
+mknod -m 600 /dev/console c 5 1 2>/dev/null || true
+mknod -m 666 /dev/null c 1 3 2>/dev/null || true
+
 # Mount essential filesystems
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs none /dev 2>/dev/null || {
-    echo "devtmpfs not available, will create device nodes manually"
+    echo "devtmpfs not available, device nodes created manually"
 }
 
 sleep 1

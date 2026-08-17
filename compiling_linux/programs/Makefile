@@ -1,8 +1,7 @@
 # Simple Makefile for BusyBox initramfs with custom programs
-KERNEL_VERSION = 6.5.12
 INITRD = ../busybox_initrd/initrd
 PROGRAMS_DIR = .
-KERNEL_BUILD = ../tinylinux/linux-$(KERNEL_VERSION)
+KERNEL_BUILD = ../../../../../../
 OUT = ../busybox_initrd/out/initramfs.cpio.gz
 
 # Default: build everything
@@ -17,7 +16,9 @@ $(OUT): busybox programs ko scripts
 busybox:
 	@if [ ! -f $(INITRD)/bin/busybox ]; then \
 		echo "Building BusyBox..."; \
+		cd ../; \
 		./busybox_initrd.sh; \
+		cd -; \
 	fi
 
 # Compile programs
@@ -60,9 +61,17 @@ scripts:
 	@chmod +x $(PROGRAMS_DIR)/scripts/*.sh || :
 	@cp $(PROGRAMS_DIR)/scripts/* $(INITRD)/scripts/ || :
 
+devices:
+	@echo "Creating device nodes..."
+	@rm -rf $(INITRD)/dev
+	@mkdir -p $(INITRD)/dev
+	sudo mknod $(INITRD)/dev/console c 5 1
+	sudo mknod $(INITRD)/dev/null c 1 3
+	sudo mknod $(INITRD)/dev/random c 1 8
+
 # Clean everything
 clean:
-	rm -rf busybox_initrd
+	rm -rf ../busybox_initrd
 	rm -f $(PROGRAMS_DIR)/*.o
 	rm -rf $(PROGRAMS_DIR)/modules/*.o $(PROGRAMS_DIR)/modules/*.ko $(PROGRAMS_DIR)/modules/*.mod $(PROGRAMS_DIR)/modules/*.mod.c $(PROGRAMS_DIR)/modules/*.mod.o
 	rm -f $(PROGRAMS_DIR)/modules/Kbuild $(PROGRAMS_DIR)/modules/Module.symvers $(PROGRAMS_DIR)/modules/modules.order

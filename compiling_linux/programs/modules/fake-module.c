@@ -16,6 +16,7 @@ static struct class *cls;
 #define IOCTL_RUN_VMCALL   _IOW('v', 1, unsigned long)  // does vmcall
 #define IOCTL_RUN_CPUID     _IOW('v', 2, unsigned long)  // does cpuid
 #define IOCTL_RUN_OUTB     _IOW('v', 3, unsigned long)  // does out 0xE9 from kernel
+#define IOCTL_RUN_EMPTY    _IOW('v', 4, unsigned long)  // does nothing
 
 static long dev_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
 
@@ -31,6 +32,9 @@ static long dev_ioctl(struct file *f, unsigned int cmd, unsigned long arg){
         }
         case IOCTL_RUN_OUTB: {
             asm volatile("outb %b0, %w1":: "a"('T'), "Nd"(0xe9) : "memory");
+            break;
+        }
+        case IOCTL_RUN_EMPTY: {
             break;
         }
         default: return -EINVAL;
@@ -52,7 +56,7 @@ static int __init fake_init(void){
     ret = cdev_add(&cdev, devno, 1);
     if (ret) goto err_unregister;
 
-    cls = class_create("kvm-fake");
+    cls = class_create(THIS_MODULE, "kvm-fake");
     if (IS_ERR(cls)) { ret = PTR_ERR(cls); goto err_cdev; }
 
     if (!device_create(cls, NULL, devno, NULL, "kvm-fake")) {
